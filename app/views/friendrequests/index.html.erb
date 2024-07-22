@@ -1,0 +1,63 @@
+<% if @friends.present? %>
+  <h2>Friends</h2>
+  <% @friends.each do |friend| %>
+    <li><%= friend.name %>
+    <%= button_to "REMOVE FRIEND", friendrequest_path(friend_request_id(friend)), method: :delete, 
+        data: { confirm: "Are you sure you want to remove this friend?" } %>
+    </li>
+  <% end %>
+<% end %>
+
+<% if @requested_requests.present? || @received_requests.present? %>
+    <h1>Friend Requests</h1>  
+<% end %>
+
+
+<% if @requested_requests.present? %>
+    <h3>Friend Requests Sent to: </h3>
+    <ol>
+  <% @requested_requests.each do |request|%>
+        <li><%= request.receiver.name %>
+            <%= button_to 'Cancel Friend Request', friendrequest_path(request),
+                method: :delete, data: { confirm: 'Are you sure you want to cancel this friend request?' } %>
+        </li>
+
+
+    
+  <% end %>
+    </ol>
+<% end %>
+
+<% if @received_requests.present? %>
+    <h3>Got Request From: </h3>
+    
+    <ol>
+    <% @received_requests.each do |request|%> 
+
+        <li><%= request.requestor.name %>
+            <%= button_to 'Accept', friendrequest_path(request), 
+                method: :patch, data: { confirm: 'Are you sure you want to accept this friend request?' } %>
+            <%= button_to 'Cancel', friendrequest_path(request), 
+                method: :delete, data: { confirm: 'Are you sure you want to cancel this friend request?' } %>
+            </li>
+    <% end %>
+    </ol>
+<% end %>
+
+<% if @not_related %>
+    <h2>People you may know </h2>
+
+    <ol>
+        <% @not_related.each do |user| %>
+            <li><%= user.name %> 
+
+            <%= form_with model: FriendRequest.new, url: friendrequests_path, local: true do |f| %>
+          <%= f.hidden_field :requestor_id, value: current_user.id %>
+          <%= f.hidden_field :receiver_id, value: user.id %>
+          <%= f.submit 'Send Friend Request' %>
+        <% end %>
+            
+            </li>
+        <% end %>
+    </ol>
+<% end %>
